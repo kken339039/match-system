@@ -15,7 +15,7 @@ type MatchedUserResponse struct {
 }
 
 type QuerySinglePeopleResponse struct {
-	Items []PeopleResponse
+	People []PeopleResponse
 }
 
 type PeopleResponse struct {
@@ -63,6 +63,6 @@ func ParseQuerySinglePeopleResponse(result []model_interfaces.User) *QuerySingle
 	}
 
 	return &QuerySinglePeopleResponse{
-		Items: peoples,
+		People: peoples,
 	}
 }
