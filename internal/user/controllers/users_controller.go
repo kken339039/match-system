@@ -3,7 +3,7 @@ package users_controllers
 import (
 	"encoding/json"
 	"fmt"
-	"match-system/plugin"
+	"match-system/plugins"
 	"net/http"
 	"strconv"
 
@@ -15,12 +15,12 @@ import (
 )
 
 type UsersController struct {
-	logger  *plugin.Logger
-	env     *plugin.Env
+	logger  *plugins.Logger
+	env     *plugins.Env
 	service *users_services.UsersService
 }
 
-func RegisterController(router *mux.Router, logger *plugin.Logger, env *plugin.Env) {
+func RegisterController(router *mux.Router, logger *plugins.Logger, env *plugins.Env) {
 	service := users_services.NewUsersService(logger)
 	uc := &UsersController{
 		logger:  logger,

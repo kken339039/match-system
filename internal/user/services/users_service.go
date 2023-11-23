@@ -5,17 +5,18 @@ import (
 	"fmt"
 	model_interfaces "match-system/interfaces/models"
 	store "match-system/internal/store"
-	"match-system/plugin"
+
+	"match-system/plugins"
 
 	"github.com/samber/lo"
 )
 
 type UsersService struct {
-	logger *plugin.Logger
+	logger *plugins.Logger
 	store  *store.Memory
 }
 
-func NewUsersService(logger *plugin.Logger) *UsersService {
+func NewUsersService(logger *plugins.Logger) *UsersService {
 	return &UsersService{
 		logger: logger,
 		store:  store.MemoryStore,

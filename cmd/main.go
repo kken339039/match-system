@@ -2,16 +2,16 @@ package main
 
 import (
 	"match-system/internal"
-	"match-system/plugin"
+	"match-system/plugins"
 )
 
 func main() {
-	env := plugin.NewEnv()
+	env := plugins.NewEnv()
 	env.SetDefaultEnv(map[string]string{
 		"ENVIRONMENT": "development",
 		"PORT":        "3000",
 	})
-	plugin.NewLogger(env)
+	plugins.NewLogger(env)
 
 	mux := internal.NewMux()
 	mux.Serve()

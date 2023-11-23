@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
-	"match-system/plugin"
+	"match-system/plugins"
 
 	users_controllers "match-system/internal/user/controllers"
 
@@ -23,12 +23,12 @@ func NewMux() *Mux {
 }
 
 func (m *Mux) Serve() {
-	env := plugin.SysEnv
-	logger := plugin.SysLogger
+	env := plugins.SysEnv
+	logger := plugins.SysLogger
 	port := fmt.Sprintf(":%s", env.GetEnv("PORT"))
 
 	users_controllers.RegisterController(m.router, logger, env)
-	http.Handle("/", plugin.RequestInterceptor(m.router, logger))
+	http.Handle("/", plugins.RequestInterceptor(m.router, logger))
 
 	logger.Info(fmt.Sprintf("== Server is running on%s", port))
 	err := http.ListenAndServe(port, nil)
