@@ -2,7 +2,9 @@ package repository_interfaces
 
 import model_interfaces "match-system/interfaces/models"
 
-type Store interface {
+type Memory interface {
 	GetUsers() []model_interfaces.User
 	GetMatched() []model_interfaces.User
+	SetUsers([]model_interfaces.User)
+	SetMatched([]model_interfaces.User)
 }
