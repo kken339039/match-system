@@ -70,7 +70,14 @@ func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Req
 
 func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
-	qeuryCount, err := strconv.Atoi(queryParams.Get("N"))
+
+	var err error
+	var qeuryCount int
+	if queryParams.Get("N") == "" {
+		qeuryCount = 1
+	} else {
+		qeuryCount, err = strconv.Atoi(queryParams.Get("N"))
+	}
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Cannot not parse query count N, err: %s", err))

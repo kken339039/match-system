@@ -30,10 +30,10 @@ func ParseAddSinglePersonAndMatchResponse(user model_interfaces.User) *AddSingle
 	matches := []MatchedUserResponse{}
 	for _, match := range user.GetMatches() {
 		matches = append(matches, MatchedUserResponse{
-			match.GetID(),
-			match.GetName(),
-			match.GetHeight(),
-			match.GetGender(),
+			ID:     match.GetID(),
+			Name:   match.GetName(),
+			Height: match.GetHeight(),
+			Gender: match.GetGender(),
 		})
 	}
 	people := PeopleResponse{
