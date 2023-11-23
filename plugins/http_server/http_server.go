@@ -50,7 +50,6 @@ func (m HttpServer) Serve() {
 		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "PATCH"},
 	})
 
-	// go func() {
 	lis := *m.listener
 	logger.Info(fmt.Sprintf("Http server is up and running on %s", lis.Addr().String()))
 	m.router.MethodNotAllowedHandler = notAllowedHandler(m.router)
@@ -59,7 +58,6 @@ func (m HttpServer) Serve() {
 	if err := http.Serve(lis, cors.Handler(loggedRouter)); err != nil {
 		logger.Fatalf("failed to serve: %v", err)
 	}
-	// }()
 }
 
 func NewHttpServer(router *mux.Router) *HttpServer {
@@ -106,8 +104,10 @@ func notAllowedHandler(x *mux.Router) http.Handler {
 		})
 
 		if err != nil {
-			NotFound(w, r)
+			InternalServerError(w, r, err)
+			return
 		}
+		NotFound(w, r)
 	})
 }
 
