@@ -2,7 +2,6 @@ package users_services
 
 import (
 	"errors"
-	"fmt"
 	model_interfaces "match-system/interfaces/models"
 	store "match-system/internal/store"
 
@@ -34,12 +33,8 @@ func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_in
 			(newUser.GetGender() == "male" && newUser.GetHeight() > user.GetHeight()) ||
 			(newUser.GetGender() == "female" && newUser.GetHeight() < user.GetHeight()) {
 
-			fmt.Println("----------------0")
 			newUser.AddMatches(user)
-			fmt.Println("----------------0")
-			fmt.Println("----------------1")
 			user.AddMatches(newUser)
-			fmt.Println("----------------1")
 
 			newUser.DecreaseDateCount()
 			user.DecreaseDateCount()
@@ -61,12 +56,6 @@ func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_in
 
 	allUsers := append(us.store.GetUsers(), newUser)
 	us.store.SetUsers(allUsers)
-
-	fmt.Println("----------------2")
-	for _, match := range newUser.GetMatches() {
-		fmt.Println(match.GetID())
-	}
-	fmt.Println("----------------2")
 	return newUser, nil
 }
 
