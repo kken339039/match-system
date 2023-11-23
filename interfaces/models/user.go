@@ -10,6 +10,7 @@ type User interface {
 
 	GenerateID()
 	AddMatches(User)
+	RemoveMatchUserRelationByID(string)
 	DecreaseDateCount()
 	IsSameUser(User) bool
 }

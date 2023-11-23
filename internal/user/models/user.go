@@ -5,6 +5,7 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 )
 
 // https://github.com/uber-go/guide/blob/master/style.md#verify-interface-compliance
@@ -17,7 +18,7 @@ type User struct {
 	Gender      string `json:"gender"`
 	WantedDates int    `json:"wanted_dates"`
 
-	Matches []User
+	Matches []model_interfaces.User
 }
 
 func (u *User) GetID() string {
@@ -41,12 +42,7 @@ func (u *User) GetWantedDates() int {
 }
 
 func (u *User) GetMatches() []model_interfaces.User {
-	matches := []model_interfaces.User{}
-	for _, match := range u.Matches {
-		matches = append(matches, &match)
-	}
-
-	return matches
+	return u.Matches
 }
 
 func (u *User) GenerateID() {
@@ -54,8 +50,17 @@ func (u *User) GenerateID() {
 }
 
 func (u *User) AddMatches(user model_interfaces.User) {
-	userInstance, _ := user.(*User)
-	u.Matches = append(u.Matches, *userInstance)
+	u.Matches = append(u.Matches, user)
+}
+
+func (u *User) RemoveMatchUserRelationByID(userId string) {
+	_, index, ok := lo.FindLastIndexOf(u.GetMatches(), func(match model_interfaces.User) bool {
+		return match.GetID() == userId
+	})
+
+	if ok {
+		u.Matches = append(u.Matches[:index], u.Matches[index+1:]...)
+	}
 }
 
 func (u *User) DecreaseDateCount() {

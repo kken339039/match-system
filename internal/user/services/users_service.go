@@ -28,26 +28,45 @@ func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_in
 	defer us.store.Mutex.Unlock()
 
 	newUser.GenerateID()
-	allUsers := append(us.store.GetUsers(), newUser)
-	us.store.SetUsers(allUsers)
 
-	for _, user := range allUsers {
+	for _, user := range us.store.GetUsers() {
 		if (user.GetGender() != newUser.GetGender()) &&
 			(newUser.GetGender() == "male" && newUser.GetHeight() > user.GetHeight()) ||
 			(newUser.GetGender() == "female" && newUser.GetHeight() < user.GetHeight()) {
 
-			if newUser.GetWantedDates() <= 0 || user.GetWantedDates() <= 0 {
-				continue
-			}
-
+			fmt.Println("----------------0")
 			newUser.AddMatches(user)
+			fmt.Println("----------------0")
+			fmt.Println("----------------1")
 			user.AddMatches(newUser)
+			fmt.Println("----------------1")
 
 			newUser.DecreaseDateCount()
 			user.DecreaseDateCount()
+
+			var err error
+			if newUser.GetWantedDates() <= 0 {
+				err = removeUser(us.store, newUser.GetID())
+			}
+
+			if user.GetWantedDates() <= 0 {
+				err = removeUser(us.store, newUser.GetID())
+			}
+
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
+	allUsers := append(us.store.GetUsers(), newUser)
+	us.store.SetUsers(allUsers)
+
+	fmt.Println("----------------2")
+	for _, match := range newUser.GetMatches() {
+		fmt.Println(match.GetID())
+	}
+	fmt.Println("----------------2")
 	return newUser, nil
 }
 
@@ -55,18 +74,12 @@ func (us *UsersService) RemoveTargetUser(userId string) error {
 	us.store.Mutex.Lock()
 	defer us.store.Mutex.Unlock()
 
-	allUsers := us.store.GetUsers()
-	_, targetIndex, ok := lo.FindLastIndexOf(allUsers, func(user model_interfaces.User) bool {
-		return user.GetID() == userId
-	})
+	err := removeUser(us.store, userId)
 
-	if !ok {
-		errorMsg := fmt.Sprintf("User Not found, userId: %s", userId)
-		us.logger.Error(errorMsg)
-		return errors.New(errorMsg)
+	if err != nil {
+		return err
 	}
 
-	us.store.SetUsers(append(allUsers[:targetIndex], allUsers[targetIndex+1:]...))
 	return nil
 }
 
@@ -84,4 +97,22 @@ func (us *UsersService) QuerySingleUsers(queryCount int) ([]model_interfaces.Use
 		}
 	}
 	return results, nil
+}
+
+func removeUser(store *store.Memory, userId string) error {
+	users := store.GetUsers()
+	user, index, ok := lo.FindLastIndexOf(users, func(u model_interfaces.User) bool {
+		return u.GetID() == userId
+	})
+
+	if ok {
+		store.SetUsers(append(users[:index], users[index+1:]...))
+		return nil
+	}
+
+	for _, matchedUser := range user.GetMatches() {
+		matchedUser.RemoveMatchUserRelationByID(userId)
+	}
+
+	return errors.New("cannot find user by userId")
 }
