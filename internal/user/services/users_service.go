@@ -38,7 +38,6 @@ func (us *UsersService) AddSinglePersonAndMatch(newUser model_interfaces.User) e
 
 			newUser.AddMatches(user)
 			user.AddMatches(newUser)
-			us.store.SetMatched(append(us.store.GetMatched(), newUser, user))
 
 			newUser.DecreaseDateCount()
 			user.DecreaseDateCount()
@@ -70,17 +69,5 @@ func (us *UsersService) removeUser(user model_interfaces.User) {
 	users := us.store.GetUsers()
 	if index >= 0 {
 		us.store.SetUsers(append(users[:index], users[index+1:]...))
-	}
-
-	for i, mu := range us.store.GetMatched() {
-		if user.IsSameUser(mu) {
-			index = i
-			break
-		}
-	}
-
-	matched := us.store.GetMatched()
-	if index >= 0 {
-		us.store.SetMatched(append(matched[:index], matched[index+1:]...))
 	}
 }
