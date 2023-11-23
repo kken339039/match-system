@@ -1,11 +1,13 @@
 package users_services
 
 import (
-	// "match-system/internal/store"
-
+	"errors"
+	"fmt"
 	model_interfaces "match-system/interfaces/models"
 	store "match-system/internal/store"
 	"match-system/plugin"
+
+	"github.com/samber/lo"
 )
 
 type UsersService struct {
@@ -20,7 +22,7 @@ func NewUsersService(logger *plugin.Logger) *UsersService {
 	}
 }
 
-func (us *UsersService) AddSinglePersonAndMatch(newUser model_interfaces.User) (model_interfaces.User, error) {
+func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_interfaces.User, error) {
 	us.store.Mutex.Lock()
 	defer us.store.Mutex.Unlock()
 
@@ -42,33 +44,29 @@ func (us *UsersService) AddSinglePersonAndMatch(newUser model_interfaces.User) (
 
 			newUser.DecreaseDateCount()
 			user.DecreaseDateCount()
-
-			if newUser.GetWantedDates() <= 0 {
-				us.removeUser(newUser)
-			}
-
-			if user.GetWantedDates() <= 0 {
-				us.removeUser(user)
-			}
-			break
 		}
 	}
 
 	return newUser, nil
 }
 
-func (us *UsersService) removeUser(user model_interfaces.User) {
-	var index int
+func (us *UsersService) RemoveTargetUser(userId string) error {
+	us.store.Mutex.Lock()
+	defer us.store.Mutex.Unlock()
 
-	for i, u := range us.store.GetUsers() {
-		if user.IsSameUser(u) {
-			index = i
-			break
-		}
+	targetIndex := -1
+
+	allUsers := us.store.GetUsers()
+	_, found := lo.Find(allUsers, func(user model_interfaces.User) bool {
+		return user.GetID() == userId
+	})
+
+	if found {
+		errorMsg := fmt.Sprintf("User Not found, userId: %s", userId)
+		us.logger.Error(errorMsg)
+		return errors.New(errorMsg)
 	}
 
-	users := us.store.GetUsers()
-	if index >= 0 {
-		us.store.SetUsers(append(users[:index], users[index+1:]...))
-	}
+	us.store.SetUsers(append(allUsers[:targetIndex], allUsers[targetIndex+1:]...))
+	return nil
 }

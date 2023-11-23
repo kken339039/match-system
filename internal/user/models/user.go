@@ -12,7 +12,7 @@ import (
 var _ model_interfaces.User = (*User)(nil)
 
 type User struct {
-	ID string // uuid, generate by application
+	ID          string // uuid, generate by application
 	Name        string `json:"name"`
 	Height      int    `json:"height"`
 	Gender      string `json:"gender"`

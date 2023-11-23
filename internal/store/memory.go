@@ -16,7 +16,7 @@ func init() {
 var _ store_interfaces.Memory = (*Memory)(nil)
 
 type Memory struct {
-	Users   []model_interfaces.User
+	Users []model_interfaces.User
 
 	Mutex sync.Mutex
 }

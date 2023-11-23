@@ -6,6 +6,7 @@ import (
 	"match-system/plugin"
 	"net/http"
 
+	"match-system/internal/user/dtos"
 	users_models "match-system/internal/user/models"
 	users_services "match-system/internal/user/services"
 
@@ -25,7 +26,10 @@ func RegisterController(router *mux.Router, logger *plugin.Logger, env *plugin.E
 		env:     env,
 		service: service,
 	}
-	router.HandleFunc("/api/AddSinglePersonAndMatch", uc.AddSinglePersonAndMatch).Methods("POST")
+
+	router.HandleFunc("/api/users", uc.AddSinglePersonAndMatch).Methods("POST")
+	router.HandleFunc("/api/users/query", uc.QuerySinglePeople).Methods("GET")
+	router.HandleFunc("/api/users/{userId}", uc.RemoveSinglePerson).Methods("DELETE")
 }
 
 func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *http.Request) {
@@ -37,17 +41,35 @@ func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *htt
 		return
 	}
 
-	user, err := uc.service.AddSinglePersonAndMatch(&newInstance)
+	user, err := uc.service.AddUserAndMatch(&newInstance)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed create user to match, error: %s", err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(user)
+	err = json.NewEncoder(w).Encode(dtos.ParseAddSinglePersonAndMatchResponse(user))
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to encode newUser, error: %s", err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+}
+
+func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	userId := vars["userId"]
+
+	err := uc.service.RemoveTargetUser(userId)
+
+	if err != nil {
+		uc.logger.Error(fmt.Sprintf("Failed to remove target user, error: %s", err))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
+
+func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Request) {
 }
