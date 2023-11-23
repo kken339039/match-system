@@ -10,6 +10,7 @@ import (
 	"match-system/internal/user/dtos"
 	users_models "match-system/internal/user/models"
 	users_services "match-system/internal/user/services"
+	"match-system/plugins/http_server"
 
 	"github.com/gorilla/mux"
 )
@@ -38,23 +39,18 @@ func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *htt
 	err := json.NewDecoder(r.Body).Decode(&newInstance)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to decode user, error: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http_server.BadRequestError(w, r, err)
 		return
 	}
 
 	user, err := uc.service.AddUserAndMatch(&newInstance)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed create user to match, error: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http_server.InternalServerError(w, r, err)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(dtos.ParseAddSinglePersonAndMatchResponse(user))
-	if err != nil {
-		uc.logger.Error(fmt.Sprintf("Failed to encode newUser, error: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	http_server.Resoponse(w, r, dtos.ParseAddSinglePersonAndMatchResponse(user))
 }
 
 func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Request) {
@@ -65,11 +61,11 @@ func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Req
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to remove target user, error: %s", err))
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http_server.BadRequestError(w, r, err)
 		return
 	}
 
-	w.WriteHeader(http.StatusNoContent)
+	http_server.EmptyResoponse(w, r)
 }
 
 func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Request) {
@@ -78,7 +74,7 @@ func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Requ
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Cannot not parse query count N, err: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http_server.BadRequestError(w, r, err)
 		return
 	}
 
@@ -86,14 +82,9 @@ func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Requ
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Faile to Query Single Users, err: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http_server.InternalServerError(w, r, err)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(dtos.ParseQuerySinglePeopleResponse(result))
-	if err != nil {
-		uc.logger.Error(fmt.Sprintf("Failed to encode query result, err: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	http_server.Resoponse(w, r, dtos.ParseQuerySinglePeopleResponse(result))
 }

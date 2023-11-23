@@ -1,8 +1,11 @@
 package main
 
 import (
-	"match-system/internal"
+	user_ctrl "match-system/internal/user/controllers"
 	"match-system/plugins"
+	"match-system/plugins/http_server"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -13,6 +16,11 @@ func main() {
 	})
 	plugins.NewLogger(env)
 
-	mux := internal.NewMux()
-	mux.Serve()
+	logger := plugins.SysLogger
+	router := mux.NewRouter()
+
+	user_ctrl.RegisterController(router, logger, env)
+
+	s := http_server.NewHttpServer(router)
+	s.Serve()
 }
