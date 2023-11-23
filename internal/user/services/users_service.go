@@ -70,3 +70,19 @@ func (us *UsersService) RemoveTargetUser(userId string) error {
 	us.store.SetUsers(append(allUsers[:targetIndex], allUsers[targetIndex+1:]...))
 	return nil
 }
+
+func (us *UsersService) QuerySingleUsers(queryCount int) ([]model_interfaces.User, error) {
+	us.store.Mutex.Lock()
+	defer us.store.Mutex.Unlock()
+
+	var results []model_interfaces.User
+	for _, u := range us.store.GetUsers() {
+		if u.GetWantedDates() > 0 {
+			results = append(results, u)
+			if len(results) == queryCount {
+				break
+			}
+		}
+	}
+	return results, nil
+}

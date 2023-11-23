@@ -3,12 +3,8 @@ package dtos
 import model_interfaces "match-system/interfaces/models"
 
 type AddSinglePersonAndMatchResponse struct {
-	ID          string
-	Name        string
-	Height      int
-	Gender      string
-	WantedDates int
-	Matches     []MatchedUserResponse
+	PeopleResponse
+	Matches []MatchedUserResponse
 }
 
 type MatchedUserResponse struct {
@@ -16,6 +12,18 @@ type MatchedUserResponse struct {
 	Name   string
 	Height int
 	Gender string
+}
+
+type QuerySinglePeopleResponse struct {
+	Items []PeopleResponse
+}
+
+type PeopleResponse struct {
+	ID          string
+	Name        string
+	Height      int
+	Gender      string
+	WantedDates int
 }
 
 func ParseAddSinglePersonAndMatchResponse(user model_interfaces.User) *AddSinglePersonAndMatchResponse {
@@ -28,12 +36,33 @@ func ParseAddSinglePersonAndMatchResponse(user model_interfaces.User) *AddSingle
 			match.GetGender(),
 		})
 	}
-	return &AddSinglePersonAndMatchResponse{
+	people := PeopleResponse{
 		ID:          user.GetID(),
 		Name:        user.GetName(),
 		Height:      user.GetHeight(),
 		Gender:      user.GetGender(),
 		WantedDates: user.GetWantedDates(),
-		Matches:     matches,
+	}
+
+	return &AddSinglePersonAndMatchResponse{
+		people,
+		matches,
+	}
+}
+
+func ParseQuerySinglePeopleResponse(result []model_interfaces.User) *QuerySinglePeopleResponse {
+	peoples := []PeopleResponse{}
+	for _, user := range result {
+		peoples = append(peoples, PeopleResponse{
+			ID:          user.GetID(),
+			Name:        user.GetName(),
+			Height:      user.GetHeight(),
+			Gender:      user.GetGender(),
+			WantedDates: user.GetWantedDates(),
+		})
+	}
+
+	return &QuerySinglePeopleResponse{
+		Items: peoples,
 	}
 }

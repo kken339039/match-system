@@ -5,7 +5,6 @@ import (
 	"reflect"
 
 	"github.com/google/uuid"
-	"github.com/samber/lo"
 )
 
 // https://github.com/uber-go/guide/blob/master/style.md#verify-interface-compliance
@@ -44,7 +43,7 @@ func (u *User) GetWantedDates() int {
 func (u *User) GetMatches() []model_interfaces.User {
 	matches := []model_interfaces.User{}
 	for _, match := range u.Matches {
-		matches = append(matches, lo.ToPtr(match))
+		matches = append(matches, &match)
 	}
 
 	return matches

@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"match-system/plugin"
 	"net/http"
+	"strconv"
 
 	"match-system/internal/user/dtos"
 	users_models "match-system/internal/user/models"
@@ -28,7 +29,7 @@ func RegisterController(router *mux.Router, logger *plugin.Logger, env *plugin.E
 	}
 
 	router.HandleFunc("/api/users", uc.AddSinglePersonAndMatch).Methods("POST")
-	router.HandleFunc("/api/users/query", uc.QuerySinglePeople).Methods("GET")
+	router.HandleFunc("/api/users/query_single", uc.QuerySinglePeople).Methods("GET")
 	router.HandleFunc("/api/users/{userId}", uc.RemoveSinglePerson).Methods("DELETE")
 }
 
@@ -72,4 +73,27 @@ func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Req
 }
 
 func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Request) {
+	vars := mux.Vars(r)
+	qeuryCount, err := strconv.Atoi(vars["N"])
+
+	if err != nil {
+		uc.logger.Error(fmt.Sprintf("Cannot not parse query count N, err: %s", err))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	result, err := uc.service.QuerySingleUsers(int(qeuryCount))
+
+	if err != nil {
+		uc.logger.Error(fmt.Sprintf("Faile to Query Single Users, err: %s", err))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	err = json.NewEncoder(w).Encode(dtos.ParseQuerySinglePeopleResponse(result))
+	if err != nil {
+		uc.logger.Error(fmt.Sprintf("Failed to encode query result, err: %s", err))
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
 }
