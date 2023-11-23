@@ -20,10 +20,11 @@ func NewUsersService(logger *plugin.Logger) *UsersService {
 	}
 }
 
-func (us *UsersService) AddSinglePersonAndMatch(newUser model_interfaces.User) error {
+func (us *UsersService) AddSinglePersonAndMatch(newUser model_interfaces.User) (model_interfaces.User, error) {
 	us.store.Mutex.Lock()
 	defer us.store.Mutex.Unlock()
 
+	newUser.GenerateID()
 	allUsers := append(us.store.GetUsers(), newUser)
 	us.store.SetUsers(allUsers)
 
@@ -53,7 +54,7 @@ func (us *UsersService) AddSinglePersonAndMatch(newUser model_interfaces.User) e
 		}
 	}
 
-	return nil
+	return newUser, nil
 }
 
 func (us *UsersService) removeUser(user model_interfaces.User) {

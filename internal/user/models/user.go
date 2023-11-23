@@ -4,6 +4,7 @@ import (
 	model_interfaces "match-system/interfaces/models"
 	"reflect"
 
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 )
 
@@ -11,12 +12,17 @@ import (
 var _ model_interfaces.User = (*User)(nil)
 
 type User struct {
+	ID string // uuid, generate by application
 	Name        string `json:"name"`
 	Height      int    `json:"height"`
 	Gender      string `json:"gender"`
 	WantedDates int    `json:"wanted_dates"`
 
 	Matches []User
+}
+
+func (u *User) GetID() string {
+	return u.ID
 }
 
 func (u *User) GetName() string {
@@ -42,6 +48,10 @@ func (u *User) GetMatches() []model_interfaces.User {
 	}
 
 	return matches
+}
+
+func (u *User) GenerateID() {
+	u.ID = uuid.New().String()
 }
 
 func (u *User) AddMatches(user model_interfaces.User) {

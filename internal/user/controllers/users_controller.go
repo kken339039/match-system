@@ -29,22 +29,22 @@ func RegisterController(router *mux.Router, logger *plugin.Logger, env *plugin.E
 }
 
 func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *http.Request) {
-	var newUser users_models.User
-	err := json.NewDecoder(r.Body).Decode(&newUser)
+	var newInstance users_models.User
+	err := json.NewDecoder(r.Body).Decode(&newInstance)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to decode user, error: %s", err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = uc.service.AddSinglePersonAndMatch(&newUser)
+	user, err := uc.service.AddSinglePersonAndMatch(&newInstance)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed create user to match, error: %s", err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	err = json.NewEncoder(w).Encode(newUser)
+	err = json.NewEncoder(w).Encode(user)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to encode newUser, error: %s", err))
 		http.Error(w, err.Error(), http.StatusBadRequest)
