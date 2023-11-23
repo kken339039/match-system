@@ -54,14 +54,12 @@ func (us *UsersService) RemoveTargetUser(userId string) error {
 	us.store.Mutex.Lock()
 	defer us.store.Mutex.Unlock()
 
-	targetIndex := -1
-
 	allUsers := us.store.GetUsers()
-	_, found := lo.Find(allUsers, func(user model_interfaces.User) bool {
+	_, targetIndex, ok := lo.FindLastIndexOf(allUsers, func(user model_interfaces.User) bool {
 		return user.GetID() == userId
 	})
 
-	if found {
+	if !ok {
 		errorMsg := fmt.Sprintf("User Not found, userId: %s", userId)
 		us.logger.Error(errorMsg)
 		return errors.New(errorMsg)

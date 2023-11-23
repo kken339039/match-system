@@ -65,7 +65,7 @@ func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Req
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to remove target user, error: %s", err))
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
