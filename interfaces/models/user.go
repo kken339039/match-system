@@ -6,4 +6,7 @@ type User interface {
 	GetGender() string
 	GetWantedDates() int
 	GetMatches() []User
+	AddMatches(User)
+	DecreaseDateCount()
+	IsSameUser(User) bool
 }

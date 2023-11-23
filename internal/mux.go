@@ -6,6 +6,8 @@ import (
 
 	"match-system/plugin"
 
+	users_controllers "match-system/internal/user/controllers"
+
 	"github.com/gorilla/mux"
 )
 
@@ -25,6 +27,7 @@ func (m *Mux) Serve() {
 	logger := plugin.SysLogger
 	port := fmt.Sprintf(":%s", env.GetEnv("PORT"))
 
+	users_controllers.RegisterController(m.router, logger, env)
 	http.Handle("/", plugin.RequestInterceptor(m.router, logger))
 
 	logger.Info(fmt.Sprintf("== Server is running on%s", port))

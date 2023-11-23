@@ -2,6 +2,9 @@ package user_models
 
 import (
 	model_interfaces "match-system/interfaces/models"
+	"reflect"
+
+	"github.com/samber/lo"
 )
 
 // https://github.com/uber-go/guide/blob/master/style.md#verify-interface-compliance
@@ -13,7 +16,7 @@ type User struct {
 	Gender      string `json:"gender"`
 	WantedDates int    `json:"wanted_dates"`
 
-	Matches []model_interfaces.User
+	Matches []User
 }
 
 func (u *User) GetName() string {
@@ -33,5 +36,27 @@ func (u *User) GetWantedDates() int {
 }
 
 func (u *User) GetMatches() []model_interfaces.User {
-	return u.Matches
+	matches := []model_interfaces.User{}
+	for _, match := range u.Matches {
+		matches = append(matches, lo.ToPtr(match))
+	}
+
+	return matches
+}
+
+func (u *User) AddMatches(user model_interfaces.User) {
+	userInstance, _ := user.(*User)
+	u.Matches = append(u.Matches, *userInstance)
+}
+
+func (u *User) DecreaseDateCount() {
+	u.WantedDates--
+}
+
+func (u *User) IsSameUser(other model_interfaces.User) bool {
+	if o, ok := other.(*User); ok {
+		return reflect.DeepEqual(u, o)
+	}
+
+	return false
 }
