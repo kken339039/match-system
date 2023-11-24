@@ -29,10 +29,17 @@ func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_in
 
 	newUser.GenerateID()
 
-	for _, user := range us.store.GetUsers() {
+	allUsers := append(us.store.GetUsers(), newUser)
+	us.store.SetUsers(allUsers)
+
+	for _, user := range allUsers {
 		if (user.GetGender() != newUser.GetGender()) &&
 			(newUser.GetGender() == "male" && newUser.GetHeight() > user.GetHeight()) ||
 			(newUser.GetGender() == "female" && newUser.GetHeight() < user.GetHeight()) {
+
+			if newUser.GetWantedDates() == 0 || user.GetWantedDates() == 0 {
+				continue
+			}
 
 			newUser.AddMatches(user)
 			user.AddMatches(newUser)
@@ -41,11 +48,11 @@ func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_in
 			user.DecreaseDateCount()
 
 			var err error
-			if newUser.GetWantedDates() <= 0 {
+			if newUser.GetWantedDates() < 0 {
 				err = removeUser(us.store, newUser.GetID())
 			}
 
-			if user.GetWantedDates() <= 0 {
+			if user.GetWantedDates() < 0 {
 				err = removeUser(us.store, newUser.GetID())
 			}
 
@@ -55,8 +62,6 @@ func (us *UsersService) AddUserAndMatch(newUser model_interfaces.User) (model_in
 		}
 	}
 
-	allUsers := append(us.store.GetUsers(), newUser)
-	us.store.SetUsers(allUsers)
 	return newUser, nil
 }
 
@@ -96,12 +101,12 @@ func removeUser(store *store.Memory, userId string) error {
 	})
 
 	if ok {
+		for _, matchedUser := range user.GetMatches() {
+			matchedUser.RemoveMatchUserRelationByID(userId)
+		}
+
 		store.SetUsers(append(users[:index], users[index+1:]...))
 		return nil
-	}
-
-	for _, matchedUser := range user.GetMatches() {
-		matchedUser.RemoveMatchUserRelationByID(userId)
 	}
 
 	return errors.New("cannot find user by userId")
