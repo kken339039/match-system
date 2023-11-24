@@ -1,4 +1,4 @@
-.PHONY: start_dev format lint build mocks
+.PHONY: start_dev format lint build mocks test
 
 format:
 	@gofmt -e -s -w -l ./
@@ -11,6 +11,10 @@ start_dev:
 
 build:
 	@go build -o build/server cmd/main.go
+
+test:
+	@rm -rf ./coverage && mkdir coverage
+	@PROJECT_ROOT=$(PWD) ENVIRONMENT=test go test -parallel 4 -race -tags $(BUILD_TAGS_API) -covermode=atomic -coverprofile=coverage/coverage.out -coverpkg=./internal/... ./tests/...
 
 mocks:
 	go mod tidy
