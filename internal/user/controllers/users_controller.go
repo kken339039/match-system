@@ -24,15 +24,19 @@ type UsersController struct {
 
 func RegisterController(router *mux.Router, logger *plugins.Logger, env *plugins.Env) {
 	service := users_services.NewUsersService(logger)
-	uc := &UsersController{
-		logger:  logger,
-		env:     env,
-		service: service,
-	}
+	uc := New(logger, env, service)
 
 	router.HandleFunc("/api/users", uc.AddSinglePersonAndMatch).Methods("POST")
 	router.HandleFunc("/api/users/query_single", uc.QuerySinglePeople).Methods("GET")
 	router.HandleFunc("/api/users/{userId}", uc.RemoveSinglePerson).Methods("DELETE")
+}
+
+func New(logger *plugins.Logger, env *plugins.Env, service service_interfaces.UsersService) *UsersController {
+	return &UsersController{
+		logger:  logger,
+		env:     env,
+		service: service,
+	}
 }
 
 func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *http.Request) {
