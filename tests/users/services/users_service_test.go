@@ -19,7 +19,7 @@ type UsersServiceTestSuite struct {
 	logger *plugins.Logger
 	store  *store.Memory
 
-	service *user_services.UsersService
+	service       *user_services.UsersService
 	existingUser1 *user_models.User
 	existingUser2 *user_models.User
 }
@@ -73,7 +73,6 @@ func (suite *UsersServiceTestSuite) SetZeroWantedDateMultiExitedUserToStore() {
 	suite.store.SetUsers([]model_interfaces.User{suite.existingUser1, suite.existingUser2})
 }
 
-
 func (suite *UsersServiceTestSuite) TestUsersService_AddUserAndMatch_Sucess() {
 	suite.SetMultiExitedUserToStore()
 	newUser := &user_models.User{
@@ -94,7 +93,7 @@ func (suite *UsersServiceTestSuite) TestUsersService_AddUserAndMatch_Sucess() {
 func (suite *UsersServiceTestSuite) TestUsersService_AddUserAndMatch_ZeroMatch() {
 	suite.SetMultiExitedUserToStore()
 	newUser := &user_models.User{
-		ID:  uuid.New().String(),
+		ID:          uuid.New().String(),
 		Name:        "TestUser",
 		Height:      160,
 		Gender:      "male",
@@ -110,7 +109,7 @@ func (suite *UsersServiceTestSuite) TestUsersService_AddUserAndMatch_ZeroMatch()
 func (suite *UsersServiceTestSuite) TestUsersService_AddUserAndMatch_WhenDatedCountZero() {
 	suite.SetMultiExitedUserToStore()
 	newUser := &user_models.User{
-		ID:  uuid.New().String(),
+		ID:          uuid.New().String(),
 		Name:        "TestUser",
 		Height:      180,
 		Gender:      "male",
@@ -134,7 +133,7 @@ func (suite *UsersServiceTestSuite) TestUsersService_RemoveUser_Sucess() {
 func (suite *UsersServiceTestSuite) TestUsersService_RemoveUser_UserNotFound() {
 	err := suite.service.RemoveTargetUser(suite.existingUser1.GetID())
 	assert.Error(suite.T(), err)
-    assert.EqualError(suite.T(), err, "cannot find user by userId")
+	assert.EqualError(suite.T(), err, "cannot find user by userId")
 }
 
 func (suite *UsersServiceTestSuite) TestUsersService_QuerySingleUsers_Sucess() {
@@ -144,8 +143,8 @@ func (suite *UsersServiceTestSuite) TestUsersService_QuerySingleUsers_Sucess() {
 	assert.NoError(suite.T(), err)
 	assert.Len(suite.T(), result, 2)
 	for _, user := range result {
-    assert.True(suite.T(), user.GetWantedDates() > 0)
-  }
+		assert.True(suite.T(), user.GetWantedDates() > 0)
+	}
 }
 
 func (suite *UsersServiceTestSuite) TestUsersService_QuerySingleUsers_NoUserWantedDate() {
