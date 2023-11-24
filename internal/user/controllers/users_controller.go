@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 
+	service_interfaces "match-system/interfaces/services"
 	"match-system/internal/user/dtos"
 	users_models "match-system/internal/user/models"
 	users_services "match-system/internal/user/services"
@@ -18,7 +19,7 @@ import (
 type UsersController struct {
 	logger  *plugins.Logger
 	env     *plugins.Env
-	service *users_services.UsersService
+	service service_interfaces.UsersService
 }
 
 func RegisterController(router *mux.Router, logger *plugins.Logger, env *plugins.Env) {

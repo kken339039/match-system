@@ -3,6 +3,7 @@ package users_services
 import (
 	"errors"
 	model_interfaces "match-system/interfaces/models"
+	service_interfaces "match-system/interfaces/services"
 	store "match-system/internal/store"
 
 	"match-system/plugins"
@@ -15,7 +16,7 @@ type UsersService struct {
 	store  *store.Memory
 }
 
-func NewUsersService(logger *plugins.Logger) *UsersService {
+func NewUsersService(logger *plugins.Logger) service_interfaces.UsersService {
 	return &UsersService{
 		logger: logger,
 		store:  store.MemoryStore,
