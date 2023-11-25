@@ -5,6 +5,10 @@ import (
 	"match-system/plugins"
 	"match-system/plugins/http_server"
 
+	httpSwagger "github.com/swaggo/http-swagger"
+
+	_ "match-system/docs"
+
 	"github.com/gorilla/mux"
 )
 
@@ -20,6 +24,8 @@ func main() {
 	router := mux.NewRouter()
 
 	user_ctrl.RegisterController(router, logger, env)
+
+	router.PathPrefix("/swagger/").Handler(httpSwagger.WrapHandler)
 
 	s := http_server.NewHttpServer(router)
 	s.Serve()

@@ -1,4 +1,4 @@
-.PHONY: start_dev format lint build mocks test
+.PHONY: start_dev format lint build mocks test swag
 
 format:
 	@gofmt -e -s -w -l ./
@@ -15,6 +15,9 @@ build:
 test:
 	@rm -rf ./coverage && mkdir coverage
 	@PROJECT_ROOT=$(PWD) ENVIRONMENT=test go test -parallel 4 -race -tags $(BUILD_TAGS_API) -covermode=atomic -coverprofile=coverage/coverage.out -coverpkg=./internal/... ./tests/...
+
+swag:
+	swag init --parseDependency --parseInternal -g cmd/main.go
 
 mocks:
 	go mod tidy

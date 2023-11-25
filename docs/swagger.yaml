@@ -1,0 +1,140 @@
+definitions:
+  match-system_internal_user_dtos.AddSinglePersonAndMatchRequest:
+    properties:
+      gender:
+        type: string
+      height:
+        type: integer
+      name:
+        type: string
+      wanted_dates:
+        type: integer
+    type: object
+  match-system_internal_user_dtos.AddSinglePersonAndMatchResponse:
+    properties:
+      gender:
+        type: string
+      height:
+        type: integer
+      id:
+        type: string
+      matches:
+        items:
+          $ref: '#/definitions/match-system_internal_user_dtos.MatchedUserResponse'
+        type: array
+      name:
+        type: string
+      wantedDates:
+        type: integer
+    type: object
+  match-system_internal_user_dtos.MatchedUserResponse:
+    properties:
+      gender:
+        type: string
+      height:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+    type: object
+  match-system_internal_user_dtos.PeopleResponse:
+    properties:
+      gender:
+        type: string
+      height:
+        type: integer
+      id:
+        type: string
+      name:
+        type: string
+      wantedDates:
+        type: integer
+    type: object
+  match-system_internal_user_dtos.QuerySinglePeopleResponse:
+    properties:
+      people:
+        items:
+          $ref: '#/definitions/match-system_internal_user_dtos.PeopleResponse'
+        type: array
+    type: object
+info:
+  contact: {}
+paths:
+  /api/users:
+    post:
+      consumes:
+      - application/json
+      description: Add a new user to the matching system and find any possible matches
+        for the new user.
+      parameters:
+      - description: New user details
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/match-system_internal_user_dtos.AddSinglePersonAndMatchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/match-system_internal_user_dtos.AddSinglePersonAndMatchResponse'
+      summary: Add a new user and find matches
+      tags:
+      - users
+  /api/users/{userId}:
+    delete:
+      consumes:
+      - application/json
+      description: Remove a user from the match system so that the user cannot be
+        matched anymore.
+      parameters:
+      - description: User ID to be removed
+        in: path
+        name: userId
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "204":
+          description: No Content
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+      summary: Remove a user from the match system.
+      tags:
+      - users
+  /api/users/query_single:
+    get:
+      consumes:
+      - application/json
+      description: Query single users based on the specified count.
+      parameters:
+      - description: Number of users to query
+        in: query
+        name: "N"
+        required: true
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Successful response
+          schema:
+            $ref: '#/definitions/match-system_internal_user_dtos.QuerySinglePeopleResponse'
+        "400":
+          description: Bad Request
+          schema:
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            type: object
+      summary: Query single users from the match system.
+      tags:
+      - users
+swagger: "2.0"

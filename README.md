@@ -114,3 +114,14 @@ To run unit tests, use the following command:
 ```
 make test
 ``````
+
+## API documentation
+
+you can generate doc, use the following command:
+
+```
+make swag
+```
+
+after run command, you can review on browser:
+`http://localhost:3000/swagger/index.html`

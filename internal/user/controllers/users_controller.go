@@ -41,7 +41,7 @@ func New(logger *plugins.Logger, env *plugins.Env, service service_interfaces.Us
 
 // @Summary Add a new user and find matches
 // @Description Add a new user to the matching system and find any possible matches for the new user.
-// @ID add-single-person-and-match
+// @Tags users
 // @Accept  json
 // @Produce  json
 // @Param input body dtos.AddSinglePersonAndMatchRequest true "New user details"
@@ -73,6 +73,15 @@ func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *htt
 	http_server.Resoponse(w, r, dtos.ParseAddSinglePersonAndMatchResponse(user))
 }
 
+// @Summary Remove a user from the match system.
+// @Description Remove a user from the match system so that the user cannot be matched anymore.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param userId path string true "User ID to be removed"
+// @Success 204
+// @Failure 400 {object} interface{} "Bad Request"
+// @Router /api/users/{userId} [delete]
 func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
 	dto := dtos.RemoveSinglePersonRequest{
@@ -89,6 +98,17 @@ func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Req
 	http_server.EmptyResoponse(w, r)
 }
 
+// QuerySinglePeople handles the API endpoint for querying single users.
+// @Summary Query single users from the match system.
+// @Description Query single users based on the specified count.
+// @Tags users
+// @Accept json
+// @Produce json
+// @Param N query string true "Number of users to query"
+// @Success 200 {object} dtos.QuerySinglePeopleResponse "Successful response"
+// @Failure 400 {object} interface{} "Bad Request"
+// @Failure 500 {object} interface{} "Internal Server Error"
+// @Router /api/users/query_single [get]
 func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Request) {
 	queryParams := r.URL.Query()
 
