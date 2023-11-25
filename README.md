@@ -101,6 +101,47 @@ make format
 make lint
 ```
 
+## System Design Documentation
+
+This Match System is designed to efficiently match users based on their preferences, considering as gender, height, and count of wanted dates. The system is implemented in Golang and follows as microservice.
+
+### Microservices:
+
+- Users Service: Manages users relations, like adding users, removing users, and querying single users.
+
+### Data Storage:
+
+- User data is stored in-memory using a store(memory) structure. Each user contains information such as ID, name, height, gender, wanted dates, and a list of matched users.
+
+### Matching Algorithm:
+
+- Users are matched on gender and height preferences.
+- When a new user added, the system found existing users to match suitable user.
+
+### Documentation:
+
+- API documentation is generated using Swagger for reading.
+
+### Testing:
+
+Unit tests are implemented to ensure the correctness of individual components, including controllers and services.
+
+### Time Complexity of API Operations
+#### AddUserAndMatch:
+
+- Time Complexity: O(n), where n is the number of existing users.
+- Found existing users to find suitable user based gender and height.
+
+#### RemoveTargetUser:
+
+- Time Complexity: O(n), where n is the number of existing users.
+- Search the target user in the list of users and removing them.
+
+#### QuerySingleUsers:
+
+- Time Complexity: O(n), where n is the number of existing users.
+- Searching for single users based on count of wanted date which is more than zero.
+
 ## Unit Tests
 
 If you test any new test and need mock service or store some func, you can run the following command to generate mock interface for mock test return.
