@@ -9,7 +9,7 @@ import (
 
 	service_interfaces "match-system/interfaces/services"
 	"match-system/internal/user/dtos"
-	users_models "match-system/internal/user/models"
+	user_models "match-system/internal/user/models"
 	users_services "match-system/internal/user/services"
 	"match-system/plugins/http_server"
 
@@ -39,16 +39,31 @@ func New(logger *plugins.Logger, env *plugins.Env, service service_interfaces.Us
 	}
 }
 
+// @Summary Add a new user and find matches
+// @Description Add a new user to the matching system and find any possible matches for the new user.
+// @ID add-single-person-and-match
+// @Accept  json
+// @Produce  json
+// @Param input body dtos.AddSinglePersonAndMatchRequest true "New user details"
+// @Success 200 {object} dtos.AddSinglePersonAndMatchResponse
+// @Router /api/users [post]
 func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *http.Request) {
-	var newInstance users_models.User
-	err := json.NewDecoder(r.Body).Decode(&newInstance)
+	var dto dtos.AddSinglePersonAndMatchRequest
+	err := json.NewDecoder(r.Body).Decode(&dto)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to decode user, error: %s", err))
 		http_server.BadRequestError(w, r, err)
 		return
 	}
 
-	user, err := uc.service.AddUserAndMatch(&newInstance)
+	newUser := &user_models.User{
+		Name:        dto.Name,
+		Height:      dto.Height,
+		Gender:      dto.Gender,
+		WantedDates: dto.WantedDates,
+	}
+
+	user, err := uc.service.AddUserAndMatch(newUser)
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed create user to match, error: %s", err))
 		http_server.InternalServerError(w, r, err)
@@ -60,9 +75,10 @@ func (uc *UsersController) AddSinglePersonAndMatch(w http.ResponseWriter, r *htt
 
 func (uc *UsersController) RemoveSinglePerson(w http.ResponseWriter, r *http.Request) {
 	vars := mux.Vars(r)
-	userId := vars["userId"]
-
-	err := uc.service.RemoveTargetUser(userId)
+	dto := dtos.RemoveSinglePersonRequest{
+		UserID: vars["userId"],
+	}
+	err := uc.service.RemoveTargetUser(dto.UserID)
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Failed to remove target user, error: %s", err))
@@ -90,7 +106,11 @@ func (uc *UsersController) QuerySinglePeople(w http.ResponseWriter, r *http.Requ
 		return
 	}
 
-	result, err := uc.service.QuerySingleUsers(int(qeuryCount))
+	dto := dtos.QuerySinglePeopleRequest{
+		QueryCount: qeuryCount,
+	}
+
+	result, err := uc.service.QuerySingleUsers(dto.QueryCount)
 
 	if err != nil {
 		uc.logger.Error(fmt.Sprintf("Faile to Query Single Users, err: %s", err))
